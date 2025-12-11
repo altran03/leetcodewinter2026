@@ -1,0 +1,2 @@
+"""LeetCode Leaderboard Backend Application."""
+

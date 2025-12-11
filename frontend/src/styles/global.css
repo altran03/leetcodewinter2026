@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-surface-800;
+  }
+
+  body {
+    @apply bg-surface-950 text-surface-100 antialiased;
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-xl font-medium transition-all duration-200 inline-flex items-center justify-center gap-2;
+  }
+
+  .btn-primary {
+    @apply bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-800 text-white hover:bg-surface-700 border border-surface-700;
+  }
+
+  .btn-danger {
+    @apply bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30;
+  }
+
+  .card {
+    @apply bg-surface-900/50 backdrop-blur-xl border border-surface-800/50 rounded-2xl;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 bg-surface-800/50 border border-surface-700 rounded-xl text-white placeholder:text-surface-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all;
+  }
+
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .badge-easy {
+    @apply bg-difficulty-easy/20 text-difficulty-easy;
+  }
+
+  .badge-medium {
+    @apply bg-difficulty-medium/20 text-difficulty-medium;
+  }
+
+  .badge-hard {
+    @apply bg-difficulty-hard/20 text-difficulty-hard;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-brand-600;
+  }
+
+  .animate-stagger {
+    animation: slideUp 0.5s ease-out forwards;
+    animation-delay: calc(var(--stagger) * 0.05s);
+    opacity: 0;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: theme('colors.surface.900');
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.surface.700');
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.surface.600');
+}
+
+/* Table row hover effect */
+.table-row-hover {
+  @apply transition-colors hover:bg-surface-800/50;
+}
+
+/* Rank badge styles */
+.rank-1 {
+  @apply bg-gradient-to-r from-yellow-400 to-amber-500 text-black;
+}
+
+.rank-2 {
+  @apply bg-gradient-to-r from-slate-300 to-slate-400 text-black;
+}
+
+.rank-3 {
+  @apply bg-gradient-to-r from-amber-600 to-amber-700 text-white;
+}
+
