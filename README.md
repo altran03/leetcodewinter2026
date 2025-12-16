@@ -66,28 +66,63 @@ leetcodewinter2026/
 └── README.md
 ```
 
-## Quick Start
+## 🚀 Local Development
 
-### Option 1: Docker Compose (Recommended)
+### Prerequisites
+- **Docker & Docker Compose** (for easiest setup), OR
+- **Python 3.12+** and **Node.js 20+** (for manual setup)
+- **MongoDB** (included in Docker, or install locally)
 
-1. **Clone and start all services:**
-   ```bash
-   # Set your admin token (optional, has default)
-   export ADMIN_TOKEN=your-secret-token
+### Option 1: Docker Compose (Easiest - Recommended)
 
-   # Start all services
-   docker-compose up --build
-   ```
+**One command to start everything:**
 
-2. **Access the application:**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
-   - MongoDB: localhost:27017
+```bash
+# From the project root directory
+docker-compose up --build
+```
 
-### Option 2: Manual Setup
+**That's it!** Wait for all services to start, then access:
+- 🌐 **Frontend**: http://localhost:5173
+- 🔧 **Backend API**: http://localhost:8000
+- 📚 **API Docs**: http://localhost:8000/docs
+- 🗄️ **MongoDB**: localhost:27017
 
-#### Backend
+**To stop:**
+```bash
+docker-compose down
+```
+
+**To stop and remove data:**
+```bash
+docker-compose down -v
+```
+
+### Option 2: Manual Setup (No Docker)
+
+#### Step 1: Start MongoDB
+
+**Option A: Install MongoDB locally**
+- macOS: `brew install mongodb-community`
+- Linux: `sudo apt-get install mongodb`
+- Windows: Download from [mongodb.com](https://www.mongodb.com/try/download/community)
+
+Then start it:
+```bash
+# macOS/Linux
+mongod
+
+# Or use a service manager
+brew services start mongodb-community  # macOS
+sudo systemctl start mongod           # Linux
+```
+
+**Option B: Use MongoDB Atlas (Free Cloud)**
+- Sign up at [mongodb.com/atlas](https://www.mongodb.com/atlas)
+- Create a free cluster
+- Get connection string (we'll use it below)
+
+#### Step 2: Start Backend
 
 ```bash
 cd backend
@@ -99,16 +134,20 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Set environment variables (or create .env file)
-export MONGODB_URL=mongodb://localhost:27017
+# Set environment variables
+export MONGODB_URL=mongodb://localhost:27017  # Or your Atlas URL
 export MONGODB_DB_NAME=leetcode_leaderboard
-export ADMIN_TOKEN=your-secret-token
+export ADMIN_TOKEN=my-secret-token-123
 
 # Run the server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-#### Frontend
+Backend will be at: http://localhost:8000
+
+#### Step 3: Start Frontend
+
+**Open a new terminal:**
 
 ```bash
 cd frontend
@@ -116,12 +155,138 @@ cd frontend
 # Install dependencies
 npm install
 
-# Set API URL (optional, uses proxy by default)
-export VITE_API_URL=http://localhost:8000
-
 # Run development server
 npm run dev
 ```
+
+Frontend will be at: http://localhost:5173
+
+**That's it!** The frontend automatically proxies API calls to the backend.
+
+---
+
+## 🆓 Free Deployment Options
+
+All platforms below offer **free tiers** perfect for this project:
+
+### Recommended: Railway (Easiest Free Option)
+
+**Why Railway?**
+- ✅ $5/month free credit (enough for small apps)
+- ✅ Deploys from GitHub automatically
+- ✅ Built-in MongoDB option
+- ✅ Simple setup
+
+**Steps:**
+
+1. **Sign up**: [railway.app](https://railway.app) (GitHub login)
+
+2. **Deploy Backend:**
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your repo → Choose `backend` folder
+   - Add environment variables:
+     ```
+     MONGODB_URL=mongodb://mongo:27017  # If using Railway MongoDB
+     # OR
+     MONGODB_URL=mongodb+srv://user:pass@cluster.mongodb.net/leetcode_leaderboard
+     ADMIN_TOKEN=your-secret-token-here
+     CORS_ORIGINS=["https://your-frontend.vercel.app"]
+     ```
+   - Railway auto-detects Python and runs it
+
+3. **Add MongoDB (if needed):**
+   - In Railway dashboard → "New" → "Database" → "MongoDB"
+   - Copy connection string to `MONGODB_URL`
+
+4. **Deploy Frontend:**
+   - **Option A: Vercel (Free)**
+     - Push code to GitHub
+     - Go to [vercel.com](https://vercel.com) → Import project
+     - Set root directory: `frontend`
+     - Add environment variable: `VITE_API_URL=https://your-backend.railway.app`
+     - Deploy!
+   
+   - **Option B: Railway (Same Platform)**
+     - New service → Deploy from GitHub → `frontend` folder
+     - Set build command: `npm install && npm run build`
+     - Set start command: `npx serve -s dist -l 3000`
+     - Add env: `VITE_API_URL=https://your-backend.railway.app`
+
+**Your URLs:**
+- Frontend: `https://your-app.vercel.app` or `https://your-frontend.up.railway.app`
+- Backend: `https://your-backend.up.railway.app`
+
+### Alternative: Render (100% Free Tier)
+
+**Steps:**
+
+1. **Sign up**: [render.com](https://render.com) (GitHub login)
+
+2. **Deploy Backend:**
+   - "New" → "Web Service" → Connect GitHub repo
+   - Settings:
+     - **Root Directory**: `backend`
+     - **Build Command**: `pip install -r requirements.txt`
+     - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - Add environment variables (same as Railway)
+   - Deploy!
+
+3. **Add MongoDB:**
+   - "New" → "MongoDB" (free tier available)
+   - Copy connection string
+
+4. **Deploy Frontend:**
+   - Use Vercel (same as above) or Render Static Site
+
+**Note:** Render free tier spins down after 15min inactivity (takes ~30s to wake up)
+
+### Alternative: Fly.io (Free Tier)
+
+**Steps:**
+
+```bash
+# Install flyctl
+curl -L https://fly.io/install.sh | sh
+
+# Login
+fly auth login
+
+# Deploy backend
+cd backend
+fly launch
+# Follow prompts, then:
+fly secrets set MONGODB_URL=your-mongodb-url
+fly secrets set ADMIN_TOKEN=your-token
+fly secrets set CORS_ORIGINS='["https://your-frontend.vercel.app"]'
+fly deploy
+
+# Deploy frontend to Vercel (same as above)
+```
+
+### MongoDB Atlas (Free Database)
+
+**If you need a free cloud database:**
+
+1. Sign up: [mongodb.com/atlas](https://www.mongodb.com/atlas)
+2. Create free cluster (M0 - 512MB)
+3. Create database user
+4. Whitelist IP: `0.0.0.0/0` (allow all for cloud deployment)
+5. Get connection string: `mongodb+srv://user:pass@cluster.mongodb.net/leetcode_leaderboard`
+
+**Use this connection string in your backend environment variables!**
+
+---
+
+## 📝 Quick Deployment Checklist
+
+1. ✅ Push code to GitHub
+2. ✅ Deploy backend to Railway/Render/Fly.io
+3. ✅ Set backend environment variables (MongoDB URL, admin token, CORS)
+4. ✅ Deploy frontend to Vercel
+5. ✅ Set frontend `VITE_API_URL` to your backend URL
+6. ✅ Test the app!
+
+**Total cost: $0/month** 🎉
 
 ## API Endpoints
 

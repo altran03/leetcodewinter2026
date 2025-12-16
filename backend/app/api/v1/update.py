@@ -172,3 +172,30 @@ async def update_single_user(user_id: str, _: bool = Depends(verify_admin_token)
         success=True,
     )
 
+
+@router.get("/scheduler/status")
+async def get_scheduler_status():
+    """
+    Get the status of the auto-refresh scheduler.
+    Shows next scheduled update time.
+    """
+    from app.main import scheduler
+    
+    job = scheduler.get_job("leetcode_stats_update")
+    
+    if job:
+        next_run = job.next_run_time
+        return {
+            "scheduler_running": scheduler.running,
+            "job_id": job.id,
+            "job_name": job.name,
+            "next_run": next_run.isoformat() if next_run else None,
+            "interval_hours": settings.REFRESH_INTERVAL_HOURS,
+        }
+    
+    return {
+        "scheduler_running": scheduler.running,
+        "job_id": None,
+        "message": "No scheduled job found",
+    }
+
