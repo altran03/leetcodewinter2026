@@ -12,11 +12,12 @@ nixPkgs = ["python312"]
 cmds = ["pip install -r requirements.txt"]
 
 [start]
-# Start command
-cmd = "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# Start command - use Python to handle PORT env var
+cmd = "python start.py"
 
 [variables]
 # Default environment variables (can be overridden in Railway dashboard)
 PYTHONUNBUFFERED = "1"
 PYTHONDONTWRITEBYTECODE = "1"
+PORT = "8000"
 
