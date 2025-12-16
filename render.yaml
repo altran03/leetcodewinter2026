@@ -1,0 +1,25 @@
+# Render Blueprint - One-click deployment
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Backend API
+  - type: web
+    name: leetcode-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python start.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: MONGODB_URL
+        sync: false  # Must be set manually in dashboard
+      - key: ADMIN_TOKEN
+        sync: false  # Must be set manually in dashboard
+      - key: CORS_ORIGINS
+        value: '["http://localhost:5173"]'
+      - key: PORT
+        value: "10000"
+    healthCheckPath: /health
+    autoDeploy: true
+
