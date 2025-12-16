@@ -1,7 +1,8 @@
 """
 Main FastAPI application entry point.
 """
-import asyncio
+import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,8 +33,23 @@ async def scheduled_update_job():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
-    # Startup
-    await database.connect()
+    # Startup logging
+    print("=" * 50)
+    print("🚀 Starting LeetCode Leaderboard API")
+    print("=" * 50)
+    print(f"   Environment: {'Production' if not settings.DEBUG else 'Development'}")
+    print(f"   Port: {os.environ.get('PORT', '8000')}")
+    print(f"   CORS Origins: {settings.CORS_ORIGINS}")
+    print("=" * 50)
+    
+    # Connect to database
+    try:
+        await database.connect()
+    except Exception as e:
+        print(f"❌ FATAL: Could not connect to database!")
+        print(f"   Error: {e}")
+        print(f"   Please check your MONGODB_URL environment variable")
+        sys.exit(1)
     
     # Start the scheduler
     scheduler.add_job(
@@ -45,6 +61,9 @@ async def lifespan(app: FastAPI):
     )
     scheduler.start()
     print(f"⏰ [Scheduler] Started - will update stats every {settings.REFRESH_INTERVAL_HOURS} hour(s)")
+    print("=" * 50)
+    print("✅ Server ready to accept connections!")
+    print("=" * 50)
     
     yield
     
@@ -88,5 +107,11 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy"}
+    # Check database connection
+    db_status = "connected" if database.db is not None else "disconnected"
+    return {
+        "status": "healthy" if db_status == "connected" else "unhealthy",
+        "database": db_status,
+        "version": settings.APP_VERSION,
+    }
 
