@@ -38,6 +38,20 @@ async function apiRequest<T>(
 }
 
 /**
+ * Verify admin token.
+ */
+export async function verifyAdminToken(
+  adminToken: string
+): Promise<MessageResponse> {
+  return apiRequest<MessageResponse>('/admin/verify', {
+    method: 'POST',
+    headers: {
+      'X-Admin-Token': adminToken,
+    },
+  });
+}
+
+/**
  * Get the public leaderboard.
  */
 export async function getLeaderboard(
@@ -123,6 +137,35 @@ export async function updateSingleUser(
   adminToken: string
 ): Promise<MessageResponse> {
   return apiRequest<MessageResponse>(`/admin/update_user/${userId}`, {
+    method: 'POST',
+    headers: {
+      'X-Admin-Token': adminToken,
+    },
+  });
+}
+
+/**
+ * Reset baseline for a single user (admin only).
+ */
+export async function resetUserBaseline(
+  userId: string,
+  adminToken: string
+): Promise<MessageResponse> {
+  return apiRequest<MessageResponse>(`/admin/user/${userId}/reset_baseline`, {
+    method: 'POST',
+    headers: {
+      'X-Admin-Token': adminToken,
+    },
+  });
+}
+
+/**
+ * Reset baselines for all users (admin only).
+ */
+export async function resetAllBaselines(
+  adminToken: string
+): Promise<MessageResponse> {
+  return apiRequest<MessageResponse>('/admin/reset_all_baselines', {
     method: 'POST',
     headers: {
       'X-Admin-Token': adminToken,

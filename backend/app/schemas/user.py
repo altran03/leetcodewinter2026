@@ -27,9 +27,9 @@ class UserResponse(BaseModel):
     id: str = Field(..., alias="_id")
     username: str
     leetcode_username: str
-    easy_count: int
-    medium_count: int
-    hard_count: int
+    easy_count: int  # Delta (current - baseline)
+    medium_count: int  # Delta (current - baseline)
+    hard_count: int  # Delta (current - baseline)
     score: int
     last_updated: datetime
     created_at: datetime

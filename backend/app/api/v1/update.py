@@ -9,7 +9,7 @@ from app.core.db import database
 from app.core.config import settings
 from app.schemas.user import UpdateResult, MessageResponse
 from app.services.leetcode_scraper import leetcode_scraper
-from app.services.score_calculator import calculate_score
+from app.services.score_calculator import calculate_score_with_baseline
 
 router = APIRouter()
 
@@ -50,10 +50,15 @@ async def update_all_users_task() -> UpdateResult:
         stats = stats_map.get(leetcode_username)
         
         if stats:
-            score = calculate_score(
-                stats.easy_count,
-                stats.medium_count,
-                stats.hard_count,
+            # Get baseline counts (use 0 if not set for backwards compatibility)
+            baseline_easy = user.get("baseline_easy", 0)
+            baseline_medium = user.get("baseline_medium", 0)
+            baseline_hard = user.get("baseline_hard", 0)
+            
+            # Calculate score based on delta from baseline
+            score = calculate_score_with_baseline(
+                stats.easy_count, stats.medium_count, stats.hard_count,
+                baseline_easy, baseline_medium, baseline_hard,
             )
             
             await users_collection.update_one(
@@ -94,10 +99,15 @@ async def update_single_user_task(user_id: str) -> bool:
     stats = await leetcode_scraper.get_user_stats(user["leetcode_username"])
     
     if stats:
-        score = calculate_score(
-            stats.easy_count,
-            stats.medium_count,
-            stats.hard_count,
+        # Get baseline counts (use 0 if not set for backwards compatibility)
+        baseline_easy = user.get("baseline_easy", 0)
+        baseline_medium = user.get("baseline_medium", 0)
+        baseline_hard = user.get("baseline_hard", 0)
+        
+        # Calculate score based on delta from baseline
+        score = calculate_score_with_baseline(
+            stats.easy_count, stats.medium_count, stats.hard_count,
+            baseline_easy, baseline_medium, baseline_hard,
         )
         
         await users_collection.update_one(

@@ -1,5 +1,6 @@
 /**
  * Home page displaying the public leaderboard.
+ * Updated: Rankings and scores display
  */
 import { useLeaderboard } from '../hooks/useLeaderboard';
 import LeaderboardTable from '../components/LeaderboardTable';
@@ -78,15 +79,20 @@ export function Home() {
 
       {/* Scoring legend */}
       <div className="card p-4">
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-          <span className="text-surface-400">Score Formula:</span>
-          <div className="flex items-center gap-2">
-            <span className="badge badge-easy">Easy × 1</span>
-            <span className="text-surface-600">+</span>
-            <span className="badge badge-medium">Medium × 2</span>
-            <span className="text-surface-600">+</span>
-            <span className="badge badge-hard">Hard × 3</span>
+        <div className="flex flex-col items-center gap-3 text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            <span className="text-surface-400">Score Formula:</span>
+            <div className="flex items-center gap-2">
+              <span className="badge badge-easy">Easy × 1</span>
+              <span className="text-surface-600">+</span>
+              <span className="badge badge-medium">Medium × 2</span>
+              <span className="text-surface-600">+</span>
+              <span className="badge badge-hard">Hard × 3</span>
+            </div>
           </div>
+          <p className="text-xs text-surface-500">
+            📊 Only problems solved <span className="text-brand-400">after joining</span> count toward your score
+          </p>
         </div>
       </div>
 
