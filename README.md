@@ -38,8 +38,11 @@ leetcodewinter2026/
 │   │   │   ├── leetcode_scraper.py  # LeetCode API client
 │   │   │   └── score_calculator.py  # Score logic
 │   │   └── main.py               # FastAPI app entry
+│   ├── api/
+│   │   └── index.py              # Vercel serverless entry point
 │   ├── tests/
 │   ├── requirements.txt
+│   ├── vercel.json
 │   └── Dockerfile
 ├── frontend/
 │   ├── src/
@@ -165,128 +168,81 @@ Frontend will be at: http://localhost:5173
 
 ---
 
-## 🆓 Free Deployment Options
+## 🚀 Deployment (Vercel + MongoDB Atlas)
 
-All platforms below offer **free tiers** perfect for this project:
+### Step 1: Set Up MongoDB Atlas (Free Database)
 
-### Recommended: Railway (Easiest Free Option)
-
-**Why Railway?**
-- ✅ $5/month free credit (enough for small apps)
-- ✅ Deploys from GitHub automatically
-- ✅ Built-in MongoDB option
-- ✅ Simple setup
-
-**Steps:**
-
-1. **Sign up**: [railway.app](https://railway.app) (GitHub login)
-
-2. **Deploy Backend:**
-   - Click "New Project" → "Deploy from GitHub repo"
-   - Select your repo → Choose `backend` folder
-   - Add environment variables:
-     ```
-     MONGODB_URL=mongodb://mongo:27017  # If using Railway MongoDB
-     # OR
-     MONGODB_URL=mongodb+srv://user:pass@cluster.mongodb.net/leetcode_leaderboard
-     ADMIN_TOKEN=your-secret-token-here
-     CORS_ORIGINS=["https://your-frontend.vercel.app"]
-     ```
-   - Railway auto-detects Python and runs it
-
-3. **Add MongoDB (if needed):**
-   - In Railway dashboard → "New" → "Database" → "MongoDB"
-   - Copy connection string to `MONGODB_URL`
-
-4. **Deploy Frontend:**
-   - **Option A: Vercel (Free)**
-     - Push code to GitHub
-     - Go to [vercel.com](https://vercel.com) → Import project
-     - Set root directory: `frontend`
-     - Add environment variable: `VITE_API_URL=https://your-backend.railway.app`
-     - Deploy!
-   
-   - **Option B: Railway (Same Platform)**
-     - New service → Deploy from GitHub → `frontend` folder
-     - Set build command: `npm install && npm run build`
-     - Set start command: `npx serve -s dist -l 3000`
-     - Add env: `VITE_API_URL=https://your-backend.railway.app`
-
-**Your URLs:**
-- Frontend: `https://your-app.vercel.app` or `https://your-frontend.up.railway.app`
-- Backend: `https://your-backend.up.railway.app`
-
-### Alternative: Render (100% Free Tier)
-
-**Steps:**
-
-1. **Sign up**: [render.com](https://render.com) (GitHub login)
-
-2. **Deploy Backend:**
-   - "New" → "Web Service" → Connect GitHub repo
-   - Settings:
-     - **Root Directory**: `backend`
-     - **Build Command**: `pip install -r requirements.txt`
-     - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - Add environment variables (same as Railway)
-   - Deploy!
-
-3. **Add MongoDB:**
-   - "New" → "MongoDB" (free tier available)
-   - Copy connection string
-
-4. **Deploy Frontend:**
-   - Use Vercel (same as above) or Render Static Site
-
-**Note:** Render free tier spins down after 15min inactivity (takes ~30s to wake up)
-
-### Alternative: Fly.io (Free Tier)
-
-**Steps:**
-
-```bash
-# Install flyctl
-curl -L https://fly.io/install.sh | sh
-
-# Login
-fly auth login
-
-# Deploy backend
-cd backend
-fly launch
-# Follow prompts, then:
-fly secrets set MONGODB_URL=your-mongodb-url
-fly secrets set ADMIN_TOKEN=your-token
-fly secrets set CORS_ORIGINS='["https://your-frontend.vercel.app"]'
-fly deploy
-
-# Deploy frontend to Vercel (same as above)
-```
-
-### MongoDB Atlas (Free Database)
-
-**If you need a free cloud database:**
-
-1. Sign up: [mongodb.com/atlas](https://www.mongodb.com/atlas)
-2. Create free cluster (M0 - 512MB)
-3. Create database user
+1. Sign up at [mongodb.com/atlas](https://www.mongodb.com/atlas)
+2. Create a free cluster (M0 - 512MB)
+3. Create a database user
 4. Whitelist IP: `0.0.0.0/0` (allow all for cloud deployment)
 5. Get connection string: `mongodb+srv://user:pass@cluster.mongodb.net/leetcode_leaderboard`
 
-**Use this connection string in your backend environment variables!**
+### Step 2: Deploy Backend to Vercel
+
+1. Go to [vercel.com](https://vercel.com) → Login with GitHub
+
+2. Click **"Add New..."** → **"Project"**
+
+3. Select your repository
+
+4. **Configure for Backend:**
+   | Setting | Value |
+   |---------|-------|
+   | **Root Directory** | `backend` |
+   | **Framework Preset** | `Other` |
+
+5. **Add Environment Variables:**
+   | Name | Value |
+   |------|-------|
+   | `MONGODB_URL` | `mongodb+srv://user:pass@cluster.mongodb.net/leetcode_leaderboard` |
+   | `ADMIN_TOKEN` | `your-secret-token` |
+   | `CORS_ORIGINS` | `["*"]` |
+
+6. Click **"Deploy"**
+
+7. **Copy your backend URL** (e.g., `https://leetcode-backend.vercel.app`)
+
+### Step 3: Deploy Frontend to Vercel
+
+1. Go back to Vercel dashboard
+
+2. Click **"Add New..."** → **"Project"**
+
+3. Select your repository **again** (same repo, different deployment)
+
+4. **Configure for Frontend:**
+   | Setting | Value |
+   |---------|-------|
+   | **Root Directory** | `frontend` |
+   | **Framework Preset** | `Vite` |
+
+5. **Add Environment Variable:**
+   | Name | Value |
+   |------|-------|
+   | `VITE_API_URL` | `https://your-backend-url.vercel.app` |
+
+6. Click **"Deploy"**
+
+### Your URLs
+
+After deployment:
+- **Frontend**: `https://your-app.vercel.app`
+- **Backend API**: `https://your-backend.vercel.app`
+- **API Docs**: `https://your-backend.vercel.app/docs`
+
+### Note: Auto-Updates
+
+Since Vercel uses serverless functions, the auto-scheduler is disabled. To enable automatic hourly updates:
+
+1. Sign up at [cron-job.org](https://cron-job.org) (free)
+2. Create a new cron job:
+   - **URL**: `https://your-backend.vercel.app/admin/update_all`
+   - **Method**: `POST`
+   - **Header**: `X-Admin-Token: your-admin-token`
+   - **Schedule**: Every hour
 
 ---
-
-## 📝 Quick Deployment Checklist
-
-1. ✅ Push code to GitHub
-2. ✅ Deploy backend to Railway/Render/Fly.io
-3. ✅ Set backend environment variables (MongoDB URL, admin token, CORS)
-4. ✅ Deploy frontend to Vercel
-5. ✅ Set frontend `VITE_API_URL` to your backend URL
-6. ✅ Test the app!
-
-**Total cost: $0/month** 🎉
 
 ## API Endpoints
 
@@ -329,88 +285,6 @@ curl -X POST http://localhost:8000/admin/update_all \
 curl -X DELETE http://localhost:8000/admin/user/{user_id} \
   -H "X-Admin-Token: your-secret-token"
 ```
-
-## Deployment
-
-### Backend Deployment (Railway/Render/Fly.io)
-
-#### Railway
-
-1. Create a new project on [Railway](https://railway.app)
-2. Add a MongoDB database service
-3. Deploy from GitHub or Docker image:
-   ```bash
-   # Build and push Docker image
-   cd backend
-   docker build -t your-registry/leetcode-backend .
-   docker push your-registry/leetcode-backend
-   ```
-4. Set environment variables:
-   - `MONGODB_URL`: Your MongoDB connection string
-   - `ADMIN_TOKEN`: Your secret admin token
-   - `CORS_ORIGINS`: `["https://your-frontend-domain.vercel.app"]`
-
-#### Render
-
-1. Create a new Web Service on [Render](https://render.com)
-2. Connect your GitHub repository
-3. Set build command: `pip install -r requirements.txt`
-4. Set start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-5. Add environment variables (same as Railway)
-6. Add a MongoDB database (Render or MongoDB Atlas)
-
-#### Fly.io
-
-```bash
-cd backend
-
-# Install flyctl
-curl -L https://fly.io/install.sh | sh
-
-# Login and launch
-fly auth login
-fly launch
-
-# Set secrets
-fly secrets set MONGODB_URL=your-mongodb-url
-fly secrets set ADMIN_TOKEN=your-secret-token
-fly secrets set CORS_ORIGINS='["https://your-frontend.vercel.app"]'
-
-# Deploy
-fly deploy
-```
-
-### Frontend Deployment (Vercel)
-
-1. Push your code to GitHub
-2. Import project on [Vercel](https://vercel.com)
-3. Set root directory to `frontend`
-4. Set environment variables:
-   - `VITE_API_URL`: Your deployed backend URL (e.g., `https://leetcode-api.railway.app`)
-5. Deploy!
-
-**Or via CLI:**
-
-```bash
-cd frontend
-
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-
-# Set production environment variable
-vercel env add VITE_API_URL production
-# Enter: https://your-backend-url.railway.app
-```
-
-### MongoDB Atlas Setup
-
-1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/atlas)
-2. Create a database user
-3. Whitelist IPs (or allow all with `0.0.0.0/0` for cloud deployment)
-4. Get connection string: `mongodb+srv://user:password@cluster.mongodb.net/leetcode_leaderboard`
 
 ## Configuration
 
@@ -480,4 +354,3 @@ Both frontend and backend support hot reload in development:
 ## License
 
 MIT License - feel free to use this for your own leaderboards!
-
