@@ -30,7 +30,7 @@ services:
     container_name: leetcode-backend
     restart: unless-stopped
     env_file:
-      - ./backend/.env
+      - ./.env
     environment:
       # MONGODB_URL comes from .env file (for Atlas) or override here for local mongo
       # - MONGODB_URL=mongodb://mongo:27017  # Uncomment for local MongoDB
