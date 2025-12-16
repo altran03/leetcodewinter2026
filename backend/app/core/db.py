@@ -2,6 +2,7 @@
 MongoDB database connection and utilities.
 """
 import sys
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from typing import Optional
 from app.core.config import settings
@@ -24,9 +25,11 @@ class Database:
                 print("⚠️  WARNING: Using localhost MongoDB URL in production!")
                 print("   Set MONGODB_URL environment variable to your MongoDB Atlas connection string")
             
+            # Use certifi for SSL certificates (required for MongoDB Atlas on some platforms)
             self.client = AsyncIOMotorClient(
                 settings.MONGODB_URL,
                 serverSelectionTimeoutMS=10000,  # 10 second timeout
+                tlsCAFile=certifi.where(),  # Use certifi's CA bundle for SSL
             )
             
             # Test the connection
